@@ -1,0 +1,124 @@
+\documentclass{article}
+
+% Packages
+\usepackage{amsmath} % AMSmath
+\usepackage[skip=10pt plus1pt, indent=0pt]{parskip} % Manage paragraph spacing
+
+\usepackage{subcaption} % Subfigures and subtables
+\usepackage[aboveskip=1pt,skip=3pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption} % Manage table and figure captions
+\usepackage{todonotes} % Pop-up "to do" notes
+
+
+% Hyperlink management
+\usepackage[hypertexnames=false]{hyperref} 
+\hypersetup{colorlinks=true, citecolor = black, linkcolor=black, filecolor=magenta, urlcolor=black} % Hyperlink style options
+
+% Cleveref must be loaded after hyperref
+\usepackage[capitalise]{cleveref}
+
+% For numbering just one line of an equation
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+
+% Tikz
+\usepackage{tikz} % Tikz
+\usetikzlibrary{arrows.meta} % Tikz arrows
+\tikzset{nodes={font=\sffamily}} % Tikz custom font
+
+% Shorthand
+\DeclareMathOperator{\dee}{d\!} % Derivative "d"
+% \newcommand{\etall}{\emph{et. al }} % Nice "et. al" % Shouldn't need, use \citet instead.
+
+% Colours
+\definecolor{c1}{HTML}{A53F2B} % Red
+\definecolor{c2}{HTML}{AD6A36} % Orange
+\definecolor{c3}{HTML}{B59441} % Beige
+\definecolor{c4}{HTML}{887D3D} % Light green
+\definecolor{c5}{HTML}{5A6638} % Dark green\\
+
+\usetikzlibrary{external}
+\tikzexternalize % activate!
+
+\begin{document}
+
+% Cross contact model
+\begin{tikzpicture}[
+%Set node styles
+n1/.style={rectangle, draw=c3, fill=c3!60, very thick, minimum size=2cm},
+n2/.style={rectangle, draw=c5, fill=c5!60, very thick, minimum size=2cm},
+n3/.style={circle, draw=c3, fill=c3!60, very thick, minimum size=2cm}
+]
+
+% Fungicide
+% Draw nodes
+\node(preSF){};
+\node[n2](SF)[right= 2cm of preSF,align=center]{\huge $\mathrm{S_F}$ \\ \footnotesize Susceptible};
+\node[n2](EF)[right= 3cm of SF,align=center]{\huge $\mathrm{E_F}$ \\ \footnotesize Exposed};
+\node[n1](IF)[right= 3cm of EF,align=center]{\huge $\mathrm{I_F}$ \\ \footnotesize Infectious};
+\node[n1](RF)[above= 2cm of EF,align=center]{\huge $\mathrm{R_F}$ \\ \footnotesize Dead (age)};
+\node[n1](DF)[above= 2cm of IF,align=center]{\huge $\mathrm{D_F}$ \\ \footnotesize Dead (disease)};
+\node[n3](PF)[right= 2.5cm of IF,align=center]{\huge $\mathrm{P_F}$ \\ \footnotesize \parbox{1.5cm}{\centering Primary \\ \centering inoculum}};
+\node(PoutF)[above= 2cm of PF]{};
+
+% Draw progression arrows
+\draw[-{Latex[length=3mm]}] (preSF) -- (SF) node[midway, above]{};
+\draw[-{Latex[length=3mm]}] (SF) -- (EF) node[midway, above]{\small Infection};
+\draw[-{Latex[length=3mm]}] (EF) -- (IF) node[midway, above]{\small Lesions develop};
+\draw[-{Latex[length=3mm]}] (PF) -- (PoutF) node[midway, left]{};
+\draw[dotted, -{Latex[length=3mm]}] (IF) -- (PF) node[midway, above]{\small \parbox{2.2cm}{Between-season\\spore deposition}};
+\draw[-{Latex[length=3mm]}] (SF) -- (RF) node[midway, above]{};
+\draw[-{Latex[length=3mm]}] (EF) -- (RF) node[midway, left]{};
+\draw[-{Latex[length=3mm]}] (IF) -- (DF) node[midway, left]{};
+
+% Draw infection arrows
+\node(SEinterF)[right= 1.5cm of SF]{};
+\node(SEarrowF)[above= 0.6cm of SEinterF]{};
+\draw[c3, loosely dash dot dot, -{Stealth[length=2.5mm]}] (PF) to [out = 150, in = 30] (SEarrowF.south);
+\draw[c3, loosely dash dot dot, -{Stealth[length=2.5mm]}] (IF) to [out = 150, in = 30] (SEarrowF.south);
+
+
+
+% IPM
+% Draw nodes
+\node(preSM)[below= 4cm of preSF]{};
+\node[n2](SM)[right= 2cm of preSM,align=center]{\huge $\mathrm{S_M}$\\ \footnotesize Susceptible};
+\node[n2](EM)[right= 3cm of SM,align=center]{\huge $\mathrm{E_M}$\\ \footnotesize Exposed};
+\node[n1](IM)[right= 3cm of EM,align=center]{\huge $\mathrm{I_M}$ \\ \footnotesize Infectious};
+\node[n1](RM)[below= 2cm of EM,align=center]{\huge $\mathrm{R_M}$ \\ \footnotesize Dead (age)};
+\node[n1](DM)[below= 2cm of IM,align=center]{\huge $\mathrm{D_M}$ \\ \footnotesize Dead (disease)};
+\node[n3](PM)[right= 2.5cm of IM,align=center]{\huge $\mathrm{P_M}$ \\ \footnotesize \parbox{1.5cm}{\centering Primary \\ \centering inoculum}};
+\node(PoutM)[below= 2cm of PM]{};
+
+% Draw progression arrows
+\draw[-{Latex[length=3mm]}] (preSM) -- (SM) node[midway, above]{};
+\draw[-{Latex[length=3mm]}] (SM) -- (EM) node[midway, above]{\small Infection};
+\draw[-{Latex[length=3mm]}] (EM) -- (IM) node[midway, above]{\small Lesions develop};
+\draw[-{Latex[length=3mm]}] (PM) -- (PoutM) node[midway, left]{};
+\draw[dotted, -{Latex[length=3mm]}] (IM) -- (PM) node[midway, above] {\small \parbox{2.2cm}{Between-season\\spore deposition}};
+\draw[-{Latex[length=3mm]}] (SM) -- (RM) node[midway, below]{};
+\draw[-{Latex[length=3mm]}] (EM) -- (RM) node[midway, left]{};
+\draw[-{Latex[length=3mm]}] (IM) -- (DM) node[midway, left]{};
+
+% Draw infection arrows
+\node(SEarrowM)[right= 1.5cm of SM]{};
+\node(SEinterM)[above= 0.6cm of SEarrowM]{};
+\draw[c3, dashed, -{Stealth[length=2.5mm]}, bend right=-40, text=c4] (PM) to node[midway, above]{} (SEarrowM.south);
+\draw[c3, dashed, -{Stealth[length=2.5mm]}, bend right=-40, text=c4] (IM) to node[midway, above]{} (SEarrowM.south) ;
+
+
+
+% Cross field contact
+% Draw infection arrows
+% M -> F
+\draw[c3, dashed, -{Stealth[length=2.5mm]}, text=c4] (PM) to [out = 140, in = -30] (SEinterF.south);
+\draw[c3, dashed, -{Stealth[length=2.5mm]}, text=c4] (IM) to (SEinterF.south) ;
+\node(infection1)[above right=2.1cm of IM, text=c4]{};
+\node(infection2)[above left=0.3cm of IM, text=c4]{};
+
+% F -> M
+\draw[c3, loosely dash dot dot, -{Stealth[length=2.5mm]}, text=c4] (PF) to (SEinterM.south);
+\draw[c3, loosely dash dot dot, -{Stealth[length=2.5mm]}, text=c4] (IF) to (SEinterM.south) ;
+
+\end{tikzpicture}
+
+\end{document}\\

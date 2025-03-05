@@ -4,6 +4,8 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from Functions_analysis import Y
 import numpy as np
 from matplotlib.ticker import PercentFormatter
+from Functions_base import ic_base
+from Functions_IPM import run_year_n,run_year_f
 
 # Colours - green-beige
 c1 = '#DACAA0'
@@ -16,7 +18,7 @@ c5 = '#2D331C'
 def plot_grain_forming(ax,text=True):
     ax.axvspan(T61, T87, alpha=0.3, color=c1)
     if text == True:
-        ax.text(2275,ax.get_ylim()[1]*0.92,"Grain forming",fontsize='9',c="#524C3C",weight='bold')
+        ax.text(2275,25*0.92,"Grain forming",fontsize='9',c="#524C3C",weight='bold')
     return ax
 
 ###########################################
@@ -67,6 +69,12 @@ def plot_one_intervention(pop,labels,title,col_type):
         cols = [c4,c5,c4]
     elif col_type == 4:
         cols = [c4,c4,c5]
+        
+    # Plot comparator no control and fungicide
+    popf = run_year_f(ic_base)
+    popn = run_year_n(ic_base)
+    ax1.plot(t_growing,100*popf[:,2]/np.sum(popf[:,:5],axis=1),c=c2,label = "Fungicide",linewidth=1.5,marker='o',markevery=100,markersize=7)
+    ax1.plot(t_growing,100*popn[:,2]/np.sum(popn[:,:5],axis=1),c=c2,label = "No control",linewidth=1.5,marker='^',markevery=100,markersize=7)
     
     # Plot the infection curves
     for i in range(len(pop)):
@@ -74,10 +82,24 @@ def plot_one_intervention(pop,labels,title,col_type):
         ax1.plot(t_growing,100*pop[i][:,2]/tot,c=cols[i],label = labels[i],linewidth=2.5,linestyle=ls[i])
     
     # Fill, if it's one with variable outcomes
-    if labels[0] != "Spray at $T_{31}$":
-        Ifill = ax1.fill_between(t_growing, pop[0][:,2]/np.sum(pop[0][:,:5],axis=1), pop[-1][:,2]/np.sum(pop[-1][:,:5],axis=1), color=c4,alpha = 0.4,label="All possible\noutcomes")
+    if col_type in [1,2,3]:
+        ax1.fill_between(t_growing, 100*pop[0][:,2]/np.sum(pop[0][:,:5],axis=1), 100*pop[-1][:,2]/np.sum(pop[-1][:,:5],axis=1), color=c4,alpha = 0.4,label="All possible\noutcomes")
     
-    ax1.legend(loc= "upper left",fontsize = '9',handlelength=2.9)
+    # Plot grain forming
+    ax1 = plot_grain_forming(ax1)
+    
+    # Aesthetics
+    newhandles,newlabels = ax1.get_legend_handles_labels()
+    
+    if col_type in [1,2,3]:
+        newhandles = newhandles[2:-1]
+        newlabels = newlabels[2:-1]
+    else:
+        newhandles = newhandles[2:]
+        newlabels = newlabels[2:]
+#     newhandles = newhandles[2:]+newhandles[:2]
+#     newlabels = newlabels[2:]+newlabels[:2]
+    ax1.legend(handles = newhandles,labels=newlabels,loc= "upper left",fontsize = '9',handlelength=2.9)
     
     xmin = Temerge
     xmax = T87
@@ -87,8 +109,6 @@ def plot_one_intervention(pop,labels,title,col_type):
     ax1.set_xlabel("Time (degree-days)")
     
     ax1.yaxis.set_major_formatter(PercentFormatter(decimals=0))
-    
-    ax1 = plot_grain_forming(ax1)
     
     # Print the yields
     Ys = [Y(i) for i in pop]
