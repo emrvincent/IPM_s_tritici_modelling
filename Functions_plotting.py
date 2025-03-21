@@ -16,9 +16,10 @@ c5 = '#2D331C'
 
 # Function to highlight grain forming period on input axis
 def plot_grain_forming(ax,text=True):
+    
     ax.axvspan(T61, T87, alpha=0.3, color=c1)
     if text == True:
-        ax.text(2275,25*0.92,"Grain forming",fontsize='9',c="#524C3C",weight='bold')
+        ax.text(2275,ax.get_ylim()[1]*0.92,"Grain forming",fontsize='9',c="#524C3C",weight='bold')
     return ax
 
 ###########################################
@@ -85,6 +86,8 @@ def plot_one_intervention(pop,labels,title,col_type):
     if col_type in [1,2,3]:
         ax1.fill_between(t_growing, 100*pop[0][:,2]/np.sum(pop[0][:,:5],axis=1), 100*pop[-1][:,2]/np.sum(pop[-1][:,:5],axis=1), color=c4,alpha = 0.4,label="All possible\noutcomes")
     
+    
+    ax1.set_ylim([0,25])
     # Plot grain forming
     ax1 = plot_grain_forming(ax1)
     

@@ -282,7 +282,7 @@ def ic_proportion(input_ic,prop_i):
         raise Exception("This function needs length 12 vector")
         
     if any(ic[1:5]) != 0 or any(ic[7:11])!= 0:
-        raise Exception("Needs to be nonzero outside of S and P")
+        raise Exception("Needs to be zero outside of S and P")
                         
     # Apply the relevant proportion of farms in each control method
     ic[0] = prop_i*ic[0]
