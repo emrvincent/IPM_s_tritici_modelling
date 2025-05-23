@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from Functions_base import Temerge, T87, t_growing, k, T61
+from Functions_base import Temerge, T87, t_growing, T61, Amax
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from Functions_analysis import Y
 import numpy as np
@@ -19,61 +19,47 @@ def plot_grain_forming(ax,text=True):
     
     ax.axvspan(T61, T87, alpha=0.3, color=c1)
     if text == True:
-        ax.text(2275,ax.get_ylim()[1]*0.92,"Grain forming",fontsize='9',c="#524C3C",weight='bold')
+        ax.text(2100,ax.get_ylim()[1]*0.92,"Grain forming",fontsize='9',c="#524C3C",weight='bold')
     return ax
 
-###########################################
-## Yield bar plot
-###########################################
-def yield_barplot(ax,Ys,labels,title):
+# ###########################################
+# ## Yield bar plot
+# ###########################################
+# def yield_barplot(ax,Ys,labels,title):
     
-    if len(Ys) != len(labels):
-        raise Exception("Not the right number of labels")
+#     if len(Ys) != len(labels):
+#         raise Exception("Not the right number of labels")
         
-    if len(Ys) == 3:
-        cols = [c3,c4,c5]
-    elif len(Ys) == 4:
-        cols = [c2,c3,c4,c5]
+#     cols = [c3,c4,c5,c5,c5]
         
-    for i in range(len(Ys)):
-        ax.bar(range(i,i+1),Ys[i],color=cols[i],alpha=0.8)
+#     for i in range(len(Ys)):
+#         ax.bar(range(i,i+1),Ys[i],color=cols[i],alpha=0.8)
         
-        tc = 'k'
-        ax.text(i, Ys[i] - 0.07,"%.3f" % round(Ys[i],3),fontsize='9',horizontalalignment='center',c=tc)
+#         tc = 'k'
+#         ax.text(i, Ys[i] - 0.07,"%.3f" % round(Ys[i],3),fontsize='9',horizontalalignment='center',c=tc)
         
-    ax.set_title("Relative yield - "+title,fontsize='11')
-    ax.set_xticks(ticks = range(len(Ys)),labels = labels)
-    ax.set_ylim([0,1])
-    return ax
+#     ax.set_title("Relative yield - "+title,fontsize='11')
+#     ax.set_xticks(ticks = range(len(Ys)),labels = labels)
+#     ax.set_ylim([0,1])
+#     return ax
 
 ###########################################
 ## Infection prevalence figures for individual interventions
 ########################################### 
-def plot_one_intervention(pop,labels,title,col_type):
+def plot_one_intervention(pop,labels,title,severity=1,fill=True):
     fig,ax1 = plt.subplots(1,1,figsize = (4.5,3))
     
     if len(pop) not in [3,4]:
         raise Exception("Need either 3 or 4 populations")
     if len(pop) != len(labels):
         raise Exception("Not the right number of labels")
-        
-    if col_type != 4:
-        ls = ['--','-',':','-.']
-    else:
-        ls = [':','--','-','-.']
-        
-    if col_type == 1:
-        cols = [c4,c5,c4]
-    elif col_type == 2:
-        cols = [c4,c5,c4,c4]
-    elif col_type == 3:
-        cols = [c4,c5,c4]
-    elif col_type == 4:
-        cols = [c4,c4,c5]
+
+    ls = ['--','-',':']
+    cols = [c4,c5,c4]
         
     # Plot comparator no control and fungicide
-    popf = run_year_f(ic_base)
-    popn = run_year_n(ic_base)
+    popf = run_year_f(ic_base,severity=severity)
+    popn = run_year_n(ic_base,severity=severity)
     ax1.plot(t_growing,100*popf[:,2]/np.sum(popf[:,:5],axis=1),c=c2,label = "Fungicide",linewidth=1.5,marker='o',markevery=100,markersize=7)
     ax1.plot(t_growing,100*popn[:,2]/np.sum(popn[:,:5],axis=1),c=c2,label = "No control",linewidth=1.5,marker='^',markevery=100,markersize=7)
     
@@ -83,18 +69,17 @@ def plot_one_intervention(pop,labels,title,col_type):
         ax1.plot(t_growing,100*pop[i][:,2]/tot,c=cols[i],label = labels[i],linewidth=2.5,linestyle=ls[i])
     
     # Fill, if it's one with variable outcomes
-    if col_type in [1,2,3]:
+    if fill == True:
         ax1.fill_between(t_growing, 100*pop[0][:,2]/np.sum(pop[0][:,:5],axis=1), 100*pop[-1][:,2]/np.sum(pop[-1][:,:5],axis=1), color=c4,alpha = 0.4,label="All possible\noutcomes")
-    
-    
-    ax1.set_ylim([0,25])
-    # Plot grain forming
-    ax1 = plot_grain_forming(ax1)
+    elif fill == False:
+        None
+    else:
+        raise Exception("Fill type needs to be true or false")
     
     # Aesthetics
     newhandles,newlabels = ax1.get_legend_handles_labels()
     
-    if col_type in [1,2,3]:
+    if fill == True:
         newhandles = newhandles[2:-1]
         newlabels = newlabels[2:-1]
     else:
@@ -102,12 +87,20 @@ def plot_one_intervention(pop,labels,title,col_type):
         newlabels = newlabels[2:]
 #     newhandles = newhandles[2:]+newhandles[:2]
 #     newlabels = newlabels[2:]+newlabels[:2]
+
     ax1.legend(handles = newhandles,labels=newlabels,loc= "upper left",fontsize = '9',handlelength=2.9)
     
     xmin = Temerge
     xmax = T87
     ax1.set_xlim([xmin, xmax])
-    ax1.set_ylim([0,25])
+    if (np.max(100*popn[:,2]/np.sum(popn[:,:5],axis=1)) < 20):
+        ax1.set_ylim([0,25])
+    else:
+        ax1.set_ylim([0,30])
+        
+    # Plot grain forming
+    ax1 = plot_grain_forming(ax1)
+            
     ax1.set_title("Infection prevalence - " + title,fontsize='11')
     ax1.set_xlabel("Time (degree-days)")
     
@@ -126,61 +119,72 @@ def plot_one_intervention(pop,labels,title,col_type):
         peaks[i] = np.max(I_perc)
         peaktimes[i] = np.argmax(I_perc) + Temerge
     print("Peak percent infection" + "\n" + str(peaks))
-    print("Peak infection time" + "\n" + str(peaktimes))
+#     print("Peak infection time" + "\n" + str(peaktimes))
     
     return fig,ax1
 
-###########################################
-## Infection prevalence and yield for the single-field scenario
-########################################### 
-def plot_one_field(pop,labels,title):
-    fig1,ax1 = plt.subplots(1,1,figsize = (4.2,3))
+# ###########################################
+# ## Infection prevalence and yield for the single-field scenario
+# ########################################### 
+# def plot_one_field(pop,labels,title):
+#     fig1,(ax1,ax12) = plt.subplots(1,2,figsize = (7,3))
     
-    if len(pop) not in [3,4]:
-        raise Exception("Need either 3 or 4 populations")
-    if len(pop) != len(labels):
-        raise Exception("Not the right number of labels")
+#     if len(pop) not in [5]:
+#         raise Exception("Need 3 populations, +2 variations for IPM")
+#     if len(pop) != len(labels):
+#         raise Exception("Not the right number of labels")
         
-    ls = ['-','--',':','-.']
-    if len(pop) == 3:
-        cols = [c3,c4,c5]
-    elif len(pop) == 4:
-        cols = [c2,c3,c4,c5]
+#     ls = ['-','--',':',':',':']
+#     cols = [c3,c4,c5,c5,c5]
     
-    # Plot the infection curves
-    for i in range(len(pop)):
-        tot = np.sum(pop[i][:,:5],axis=1)
-        ax1.plot(t_growing,100*pop[i][:,2]/tot,c=cols[i],label = labels[i],linewidth=2.5,linestyle=ls[i])
+#     # Plot the infection curves
+#     for i in range(len(pop)):
+#         tot = np.sum(pop[i][:,:5],axis=1)
+#         ax1.plot(t_growing,100*pop[i][:,2]/tot,c=cols[i],label = labels[i],linewidth=2.5,linestyle=ls[i])
 
-    ax1.legend(loc= "upper left",fontsize = '9')
+#     ax1.legend(loc= "upper left",fontsize = '9')
     
-    xmin = Temerge
-    xmax = T87
-    ax1.set_xlim([xmin, xmax])
-    ax1.set_ylim([0,25])
-    ax1.set_title("Infection prevalence - " + title,fontsize='11')
-    ax1.set_xlabel("Time (degree-days)")
-    ax1.yaxis.set_major_formatter(PercentFormatter(decimals=0))
+#     xmin = Temerge
+#     xmax = T87
+#     ax1.set_xlim([xmin, xmax])
+#     ax1.set_ylim([0,25])
+#     ax1.set_title("Infection prevalence - " + title,fontsize='11')
+#     ax1.set_xlabel("Time (degree-days)")
+#     ax1.yaxis.set_major_formatter(PercentFormatter(decimals=0))
     
-    ax1 = plot_grain_forming(ax1)
+#     ax1 = plot_grain_forming(ax1)
     
-    # Plot the yields
-    fig2,ax2 = plt.subplots(1,1,figsize = (4,3))
-    Ys = [Y(i) for i in pop]
-    ax2 = yield_barplot(ax2,Ys,labels,title)
+#     # Plot the healthy curves
+#     for i in range(len(pop)):
+#         ax12.plot(t_growing,pop[i][:,0],c=cols[i],label = labels[i],linewidth=2.5,linestyle=ls[i])
+  
+#     xmin = Temerge
+#     xmax = T87
+#     ax12.set_xlim([xmin, xmax])
+#     ax12.set_ylim([0,Amax])
+#     ax12.set_title("Area healthy leaf tissue - " + title,fontsize='11')
+#     ax12.set_xlabel("Time (degree-days)")
     
-    # Print the peak infection prevalence and time
-    peaks = [0]*len(pop)
-    peaktimes = [0]*len(pop)
-    for i in range(len(pop)):
-        tot = np.sum(pop[i][:,:5],axis=1)
-        I_perc = pop[i][:,2]/tot
-        peaks[i] = np.max(I_perc)
-        peaktimes[i] = np.argmax(I_perc) + Temerge
-    print("Peak percent infection" + "\n" + str(peaks))
-    print("Peak infection time" + "\n" + str(peaktimes))
+#     ax12 = plot_grain_forming(ax12)
+
     
-    return fig1,ax1,fig2,ax2
+#     # Plot the yields
+#     fig2,ax2 = plt.subplots(1,1,figsize = (7,3))
+#     Ys = [Y(i) for i in pop]
+#     ax2 = yield_barplot(ax2,Ys,labels,title)
+    
+#     # Print the peak infection prevalence and time
+#     peaks = [0]*len(pop)
+#     peaktimes = [0]*len(pop)
+#     for i in range(len(pop)):
+#         tot = np.sum(pop[i][:,:5],axis=1)
+#         I_perc = pop[i][:,2]/tot
+#         peaks[i] = np.max(I_perc)
+#         peaktimes[i] = np.argmax(I_perc) + Temerge
+#     print("Peak percent infection" + "\n" + str(peaks))
+#     print("Peak infection time" + "\n" + str(peaktimes))
+    
+#     return fig1,ax1,fig2,ax2
 
 ###########################################
 ## Plot SEI for one farm (Supp Info figure)
@@ -201,19 +205,19 @@ def plot_one_farm_type(pop, strategy_code):
     S = pop[:,0]
     E = pop[:,1]
     I = pop[:,2]
-    ax.plot(t_growing,S,c='tab:green',label = "S",linewidth=2,linestyle=':')
-    ax.plot(t_growing,E,c='tab:orange',label = "E",linewidth=2,linestyle='-')
-    ax.plot(t_growing,I,c='tab:red',label = "I",linewidth=2,linestyle='--')
+    ax.plot(t_growing,S,c=c5,label = "S",linewidth=2,linestyle=':')
+    ax.plot(t_growing,E,c=c4,label = "E",linewidth=2,linestyle='-')
+    ax.plot(t_growing,I,c=c2,label = "I",linewidth=2,linestyle='--')
     
-    # Plot inset
-    if strategy_code in ['f','i']:
-        inset_ax = inset_axes(ax,width='24%',height=0.6)
-        inset_ax.plot(t_growing,S,c='tab:green',label = "S",linewidth=2,linestyle=':')
-        inset_ax.plot(t_growing,E,c='tab:orange',label = "E",linewidth=2,linestyle='-')
-        inset_ax.plot(t_growing,I,c='tab:red',label = "I",linewidth=2,linestyle='--')
-        inset_ax.set_xlim([2500, xmax])
-        inset_ax.set_ylim([0,0.15])
-        inset_ax = plot_grain_forming(inset_ax,False)
+#     # Plot inset
+#     if strategy_code in ['f','i']:
+#         inset_ax = inset_axes(ax,width='24%',height=0.6)
+#         inset_ax.plot(t_growing,S,c='tab:green',label = "S",linewidth=2,linestyle=':')
+#         inset_ax.plot(t_growing,E,c='tab:orange',label = "E",linewidth=2,linestyle='-')
+#         inset_ax.plot(t_growing,I,c='tab:red',label = "I",linewidth=2,linestyle='--')
+#         inset_ax.set_xlim([2500, xmax])
+#         inset_ax.set_ylim([0,0.15])
+#         inset_ax = plot_grain_forming(inset_ax,False)
     
     if strategy_code == 'n':
         ax.legend(loc = "upper right",fontsize = '9')

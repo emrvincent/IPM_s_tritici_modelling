@@ -103,7 +103,7 @@ n4/.style={rectangle, draw=black, fill=white}
 
 % Draw progression arrows
 \draw[-{Latex[length=3mm]}] (preSF) -- (SF) node[midway, above]{\large $g_F(A,t)$};
-\draw[-{Latex[length=3mm]}] (SF) -- (EF) node[midway, above]{\large $\lambda_F(t)$};
+\draw[-{Latex[length=3mm]}] (SF) -- (EF) node[midway, above]{\large $\Lambda_F(t)$};
 \draw[-{Latex[length=3mm]}] (EF) -- (IF) node[midway, above]{\large $\gamma(1-\epsilon(t))$};
 \draw[-{Latex[length=3mm]}] (PF) -- (PoutF) node[midway, left]{\large $\nu$};
 \draw[dotted, -{Latex[length=3mm]}] (IF) -- (PF) node[midway, above]{\large $\Psi$};
@@ -132,7 +132,7 @@ n4/.style={rectangle, draw=black, fill=white}
 
 % Draw progression arrows
 \draw[-{Latex[length=3mm]}] (preSM) -- (SM) node[midway, above]{\large $g_M(A,t)$};
-\draw[-{Latex[length=3mm]}] (SM) -- (EM) node[midway, above]{\large $\lambda_M(t)$};
+\draw[-{Latex[length=3mm]}] (SM) -- (EM) node[midway, above]{\large $\Lambda_M(t)$};
 \draw[-{Latex[length=3mm]}] (EM) -- (IM) node[midway, above]{\large $\gamma(1-\hat{\epsilon}(t))$};
 \draw[-{Latex[length=3mm]}] (PM) -- (PoutM) node[midway, left]{\large $\nu$};
 \draw[dotted, -{Latex[length=3mm]}] (IM) -- (PM) node[midway, above] {\large \parbox{2cm}{$r_\Psi(pq\Psi +$ \\  $(1-p)\Psi)$}};
@@ -161,7 +161,7 @@ n4/.style={rectangle, draw=black, fill=white}
 \draw[c3, loosely dash dot dot, -{Stealth[length=2.5mm]}, text=c4] (IF) to (SEinterM.south) ;
 
 % Put in legend
-\node[n4](legend)[above = 2cm of SF]{\Large \parbox{5.5cm}{$\lambda_F(t) = \beta(1-\epsilon(t)) \iota(t)$ \\  \\ $\lambda_M(t) = r_\beta \beta(1-\hat{\epsilon}(t))\iota(t)$ \\ \\ $\iota(t) = \frac{r_\beta I_M + I_F + P_M + P_F}{A_M + A_F}$}}{};
+\node[n4](legend)[above = 2cm of SF]{\Large \parbox{6.2cm}{$\Lambda_F(t) = \beta (1-\epsilon(C(t))) \lambda(t)$ \\  \\ $\Lambda_M(t) = \beta r_\beta (1-\hat{\epsilon}(B(t)))\lambda(t)$ \\ \\ $\lambda(t) = \frac{r_\beta (I_M + P_M) + I_F + P_F}{A_M + A_F}$}}{};
 
 \end{tikzpicture}
 
